@@ -181,5 +181,26 @@ sum(impute$steps)
 ```
 ## [1] 656737.5
 ```
-Because of the imputation, the total number of steps has increased
+Because of the imputation, the total number of steps has increased.
+
 ## Are there differences in activity patterns between weekdays and weekends?
+Classify the data as weekend and weekday. Then aggregate by five minute interval and then plot.
+
+
+```r
+week <- factor(weekdays(impute$date) %in% c("Saturday","Sunday"), 
+               labels=c("weekday","weekend"), ordered=FALSE)
+
+impsteps <- aggregate(impute$steps, by=list(interval=impute$interval, weekday=week), mean)
+
+library(ggplot2)
+g <- ggplot(impsteps, aes(interval/60, x))
+g + geom_line() + facet_grid(weekday ~ .) +
+    scale_x_continuous(breaks=0:6*4, labels=paste(0:6*4,":00", sep="")) +
+    theme_bw() +
+    labs(y="average number of steps in 5-min interval") +
+    labs(x="time of day (h)") +
+    labs(title="Daily activity pattern")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
