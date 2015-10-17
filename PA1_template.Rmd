@@ -60,7 +60,46 @@ max_activity_int <- data$interval[max_activity_num]
 sprintf("%02d:%02d", floor(max_activity_int/60), max_activity_int%%60)
 ```
 ## Imputing missing values
+Check the number of NAs
+```{r}
+sum(is.na(data))
+```
+Create a new data frame called impute without the NAs. Using the average number of steps in that 5 minute interval
+```{r}
+impute <- transform(data, steps=ifelse(is.na(steps), avg_steps, steps))
+summary(impute)
+```
 
+Find out the total steps using the impute dataset
+```{r}
+impute_totalsteps <- tapply(impute$steps, impute$date, sum, na.rm=T)
+```
+Calculate the mean using impute
+```{r}
+impute_meansteps <- mean(impute_totalsteps)
+impute_meansteps
+```
 
+Calculate the median as well
+```{r}
+impute_mediansteps <- median(impute_totalsteps)
+impute_mediansteps
+```
 
+Create the histogram using impute dataset.
+```{r}
+hist(impute_totalsteps, breaks=11, 
+     xlab="number of steps/day", 
+     sub="(missing values imputed)")
+abline(v=impute_meansteps, col="green", lwd=2)
+abline(v=impute_mediansteps, col="blue", lwd=2, lty=2)
+legend(x="topright", legend=c("mean","median"), col=c("green","blue"), bty="n", lwd=2)
+```
+
+Check if and by how much the total number of steps have increased because of imputation.
+```{r}
+sum(data$steps, na.rm=TRUE)
+sum(impute$steps)
+```
+Because of the imputation, the total number of steps has increased
 ## Are there differences in activity patterns between weekdays and weekends?

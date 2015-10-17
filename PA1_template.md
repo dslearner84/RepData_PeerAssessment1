@@ -98,7 +98,88 @@ sprintf("%02d:%02d", floor(max_activity_int/60), max_activity_int%%60)
 ## [1] "08:35"
 ```
 ## Imputing missing values
+Check the number of NAs
 
+```r
+sum(is.na(data))
+```
 
+```
+## [1] 2304
+```
+Create a new data frame called impute without the NAs. Using the average number of steps in that 5 minute interval
 
+```r
+impute <- transform(data, steps=ifelse(is.na(steps), avg_steps, steps))
+summary(impute)
+```
+
+```
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 358.8  
+##  Median :  0.00   Median :2012-10-31   Median : 717.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   : 717.5  
+##  3rd Qu.: 27.00   3rd Qu.:2012-11-15   3rd Qu.:1076.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :1435.0
+```
+
+Find out the total steps using the impute dataset
+
+```r
+impute_totalsteps <- tapply(impute$steps, impute$date, sum, na.rm=T)
+```
+Calculate the mean using impute
+
+```r
+impute_meansteps <- mean(impute_totalsteps)
+impute_meansteps
+```
+
+```
+## [1] 10766.19
+```
+
+Calculate the median as well
+
+```r
+impute_mediansteps <- median(impute_totalsteps)
+impute_mediansteps
+```
+
+```
+## [1] 10766.19
+```
+
+Create the histogram using impute dataset.
+
+```r
+hist(impute_totalsteps, breaks=11, 
+     xlab="number of steps/day", 
+     sub="(missing values imputed)")
+abline(v=impute_meansteps, col="green", lwd=2)
+abline(v=impute_mediansteps, col="blue", lwd=2, lty=2)
+legend(x="topright", legend=c("mean","median"), col=c("green","blue"), bty="n", lwd=2)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+
+Check if and by how much the total number of steps have increased because of imputation.
+
+```r
+sum(data$steps, na.rm=TRUE)
+```
+
+```
+## [1] 570608
+```
+
+```r
+sum(impute$steps)
+```
+
+```
+## [1] 656737.5
+```
+Because of the imputation, the total number of steps has increased
 ## Are there differences in activity patterns between weekdays and weekends?
